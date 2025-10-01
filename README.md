@@ -1,7 +1,5 @@
 # Cross
 
-**축구 중계의 정보를 강화하여 시청자의 집중과 관심을 끌어내는 인터랙티브 웹 스트리밍 서비스**
-
 ![Vue.js](https://img.shields.io/badge/Vue.js-2.6.14-4FC08D?style=flat-square&logo=vue.js)
 ![Node.js](https://img.shields.io/badge/Node.js-Express-339933?style=flat-square&logo=node.js)
 ![Python](https://img.shields.io/badge/Python-FastAPI-3776AB?style=flat-square&logo=python)
@@ -247,9 +245,9 @@ Cross는 **3-tier 아키텍처**로 설계되어 Frontend, Streaming Backend, An
 #### 데이터 처리 파이프라인
 ![데이터 처리 구조](assets/images/architecture/Cross_데이터처리.png)
 
-축구 경기의 트래킹 데이터를 수집하고 전처리하여, 실시간 분석이 가능한 형태로 가공하는 파이프라인을 구축했습니다.
+축구 경기의 트래킹 데이터를 수집하고 전처리하는 파이프라인을 구축했습니다.
 
-#### 실시간 시각화 시스템
+#### 시각화 시스템
 ![시각화 구조](assets/images/architecture/Cross_시각화.png)
 
 Player Tracking Data와 Voronoi Diagram을 결합하여 영상 위에 증강된 데이터 시각화를 제공하는 렌더링 시스템입니다.
@@ -272,7 +270,7 @@ Player Tracking Data와 Voronoi Diagram을 결합하여 영상 위에 증강된 
 
 ![보로노이 다이어그램](assets/images/features/보로노이.png)
 
-선수들의 위치 데이터를 기반으로 보로노이 다이어그램을 실시간으로 생성하여, 경기장 내 각 선수의 지배 영역과 영향력을 직관적으로 표현합니다.
+선수들의 위치 데이터를 기반으로 보로노이 다이어그램을 생성하여, 경기장 내 각 선수의 지배 영역과 영향력을 직관적으로 표현합니다.
 
 **패스 네트워크 및 루트 시각화**
 
