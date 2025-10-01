@@ -1,1 +1,23 @@
 .DS_Store
+
+# Video files - keep only first 10 segments as samples
+socket-backend/video/video[1-9][0-9].ts
+socket-backend/video/video[1-9][0-9][0-9].ts
+socket-backend/video/video_passroot[1-9][0-9].ts
+socket-backend/video/video_passroot[1-9][0-9][0-9].ts
+socket-backend/video/video_voronoi[1-9][0-9].ts
+socket-backend/video/video_voronoi[1-9][0-9][0-9].ts
+
+# Documentation files - exclude from repository
+CLAUDE.md
+GEMINI.md
+TECHNICAL_DOCUMENTATION.md
+code_verification_summary.md
+example.md
+performance_claims_verification_report.md
+realtime_sync_architecture.md
+verified_resume_achievements.md
+web_developer_achievements.md
+구현 관련 고민 메모.md
+발표 스크립트.md
+졸업전시_브로셔_내용.md

@@ -20,6 +20,7 @@
       <div class="video-tools__column">
         <img
           class="icon"
+          ref="videoChange"
           v-bind:class="{ icon_on: videoStatus.name !== 'default' }"
           v-for="(videoStatus, idx) in videoStatusList"
           :key="idx"
@@ -316,6 +317,9 @@ export default {
       }
 
       video.currentTime = this.$store.getters.getCurrentTime;
+    },
+    changeClick() {
+      this.$refs.videoChange[0].click();
     },
   },
 };

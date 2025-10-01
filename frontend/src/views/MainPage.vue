@@ -1,6 +1,6 @@
 <template>
   <div class="layout">
-    <img class="background-image" src="@/assets/background.png" />
+    <img class="background-image" src="@/assets/background_pro.png" />
     <router-link to="/begginerViewer" class="mode">
       <div class="mode-info">
         <h1 class="mode-info__title">비기너</h1>

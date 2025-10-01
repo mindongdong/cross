@@ -1,5 +1,4 @@
 from fastapi import APIRouter
-from typing import Optional
 import numpy as np
 import pandas as pd
 import ast
@@ -12,7 +11,7 @@ phase_records = pd.read_csv('./matches/KOR.GER/phase_records_korean_sorted.csv')
 all_player_stats = pd.read_csv('./matches/KOR.GER/all_player_stats_grouped.csv')
 per_90min_stats = pd.read_csv('./matches/KOR.GER/player_stats_per_90min.csv')
 seq_records = pd.read_csv('./matches/KOR.GER/seq_records.csv')
-match_shots = pd.read_csv('./matches/KOR.GER/match_shots_korean_final.csv')
+match_shots = pd.read_csv('./matches/KOR.GER/updated_match_shots.csv')
 
 def filter_by_time(match_events, start_time=None, end_time=None):
     # Set the default values
@@ -51,6 +50,9 @@ def detect_attack_sequences(match_events, first_idx, last_idx):
     match_events = match_events[match_events['event_type'] != 'Substitution'][cols]
 
     seq_events = match_events.loc[first_idx:last_idx].copy()
+    seq_events[['end_x', 'end_y']] = seq_events[['end_x', 'end_y']].fillna(0)
+
+    print(seq_events)
 
     return seq_events
 
@@ -600,15 +602,15 @@ async def get_match_shots(current_time: float):
     response = {
         "team1": {
             "name": team1_name,
-            "goals": team1_goals[['x', 'y', 'display_name', 'xg', 'freekick']].to_dict(orient='records'),
+            "goals": team1_goals[['period', 'x', 'y', 'display_name', 'xg', 'freekick']].to_dict(orient='records'),
             "xg": team1_shots['xg'].sum().round(2)
         },
         "team2": {
             "name": team2_name,
-            "goals": team2_goals[['x', 'y', 'display_name', 'xg', 'freekick']].to_dict(orient='records'),
+            "goals": team2_goals[['period', 'x', 'y', 'display_name', 'xg', 'freekick']].to_dict(orient='records'),
             "xg": team2_shots['xg'].sum().round(2)
         },
-        "failed_shots": match_shots_failed[['team_name', 'x', 'y', 'display_name', 'xg', 'freekick']].to_dict(orient='records')
+        "failed_shots": match_shots_failed[['team_name', 'period', 'x', 'y', 'display_name', 'xg', 'freekick']].to_dict(orient='records')
     }
 
     return response

@@ -2,7 +2,11 @@
   <div class="layout" ref="videoLayout">
     <Stream></Stream>
     <Analyze ref="analyzeRef" :predictionList="predictionList"></Analyze>
-    <Wrapper :currentTime="currentTime" :totalTime="totalTime"></Wrapper>
+    <Wrapper
+      ref="wrapperRef"
+      :currentTime="currentTime"
+      :totalTime="totalTime"
+    ></Wrapper>
   </div>
 </template>
 
@@ -88,6 +92,13 @@ export default {
       console.log(frame);
       const response = await getTrackingInfo(frame);
       this.predictionList = response.data;
+    },
+    videoChange() {
+      this.$refs.wrapperRef.changeClick();
+      const video = this.$store.getters.getCurrentVideo;
+      video.currentTime = 0;
+      this.$store.commit("setCurrentTime", 0);
+      video.play();
     },
   },
 };

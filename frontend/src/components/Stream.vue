@@ -12,6 +12,7 @@
       @timeupdate="timeUpdate"
       @pause="pause"
       @seeking="timeUpdate"
+      @ended="videoChange"
     ></video>
   </div>
 </template>
@@ -85,6 +86,10 @@ export default {
     audioData(ev) {
       console.log(ev);
       this.$store.commit("setCurrentAudio", ev.target);
+    },
+    videoChange() {
+      this.$parent.videoChange();
+      console.log("videoChange");
     },
   },
 };

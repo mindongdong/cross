@@ -3,7 +3,6 @@ const cors = require("cors");
 const http = require("http");
 
 const { Server } = require("socket.io");
-const { soccerChat } = require("./ai-chat");
 
 const app = express();
 const server = http.createServer(app);
@@ -29,14 +28,6 @@ const audioRouter = require("./router/audio.js");
 
 io.on("connection", (socket) => {
   console.log("User connected");
-
-  socket.on("message", async (messages) => {
-    console.log(messages);
-    if (messages[messages.length - 1].aiTarget) {
-      const AIcomment = await soccerChat(messages);
-      if (AIcomment) io.emit("message", AIcomment);
-    }
-  });
 
   socket.on("disconnect", () => {
     console.log("User disconnected");

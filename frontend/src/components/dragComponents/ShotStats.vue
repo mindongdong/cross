@@ -23,8 +23,8 @@ export default {
   name: "AttackSeq",
   data() {
     return {
-      canvasWidth: 330, // adjust based on your need
-      canvasHeight: (330 * 228.846153846) / 350, // adjust based on your need
+      canvasWidth: 600, // adjust based on your need
+      canvasHeight: (600 * 228.846153846) / 350, // adjust based on your need
       timeInterval: null,
       shotData: null,
       team1Goals: null,
@@ -46,23 +46,21 @@ export default {
     },
     shotColorDict() {
       return {
-        독일: "rgba(150, 230, 180, 0.8)",
+        독일: "rgba(150,230,180,0.8)",
         대한민국: "rgba(255,99,132,0.8)",
       };
     },
   },
   async mounted() {
-    this.drawPitch();
     this.timeInterval = setInterval(async () => {
       const response = await getMatchShots(this.$store.getters.getCurrentTime);
       this.team1Goals = response.data.team1;
       this.team2Goals = response.data.team2;
       this.failedShots = response.data.failed_shots;
-      console.log(this.team2Goals);
-      this.drawShotData(this.team1Goals);
-      this.drawShotData(this.team2Goals);
-      this.drawShotData(this.failedShots);
+      console.log(response.data);
+      this.drawShotData(response.data);
     }, 2000);
+    this.drawPitch();
   },
   methods: {
     drawPitch() {
@@ -141,6 +139,21 @@ export default {
         100 / 3,
         180 / 3
       );
+
+      // After drawing everything, add the text to top-left
+      context.font = "16px Arial"; // You can adjust the font size and type
+      context.fillStyle = "rgba(150,230,180,0.8)"; // Font color
+      context.fillText(
+        this.team1Goals.name + " : " + this.team1Goals.xg + " xG",
+        10,
+        25
+      );
+      context.fillStyle = "rgba(255,99,132,0.8)"; // Font color
+      context.fillText(
+        this.team2Goals.name + " : " + this.team2Goals.xg + " xG",
+        10,
+        45
+      );
     },
     drawRectangle(context, x, y, width, height) {
       context.beginPath();
@@ -152,75 +165,60 @@ export default {
       context.arc(x, y, radius, 0, 2 * Math.PI);
       context.fill();
     },
-    drawShotData(shotData) {
+    drawShots(data, key) {
+      if (data.length === 0) {
+        return;
+      }
       let canvas = this.$refs.soccerCanvas;
       let context = canvas.getContext("2d");
 
+      data.forEach((shot) => {
+        let x = shot.x;
+        let y = shot.y;
+        let canvasX = this.scaleX(x);
+        let canvasY = this.reverseY(y);
+        if (shot.period === "1H") {
+          canvasX = this.reverseX(x);
+          canvasY = this.reverseY(y);
+        }
+
+        context.beginPath();
+        context.arc(
+          canvasX,
+          canvasY,
+          Math.sqrt(shot.xg) * 30,
+          0,
+          Math.PI * 2,
+          false
+        ); // size is now related to xg
+        // failedShots이면 shotColorDict으로 색을 지정하고, 아니면 goalColorDict으로 색을 지정한다.
+        context.fillStyle =
+          key === "failed_shots"
+            ? this.shotColorDict[shot.team_name]
+            : this.goalColorDict["대한민국"];
+        context.fill();
+
+        this.circles.push({
+          x: canvasX,
+          y: canvasY,
+          radius: Math.sqrt(shot.xg) * 20,
+          text: shot.display_name,
+        });
+      });
+    },
+    drawShotData(data) {
+      let canvas = this.$refs.soccerCanvas;
+      let context = canvas.getContext("2d");
       context.clearRect(0, 0, this.canvasWidth, this.canvasHeight);
       this.drawPitch();
-
-      if (shotData === this.failedShots) {
-        shotData.forEach((shot) => {
-          let x = shot.x;
-          let y = shot.y;
-          let canvasX = this.scaleX(x);
-          let canvasY = this.scaleY(y);
-          context.beginPath();
-          context.arc(
-            canvasX,
-            canvasY,
-            Math.sqrt(shot.xg) * 20,
-            0,
-            Math.PI * 2,
-            false
-          ); // size is now related to xg
-          context.fillStyle = this.shotColorDict[shot.team_name];
-          context.fill();
-
-          this.circles.push({
-            x: canvasX,
-            y: canvasY,
-            radius: Math.sqrt(shot.xg) * 20,
-            text: shot.display_name,
-          });
-        });
-      } else {
-        const goals = shotData.goals;
-        const teamName = shotData.name;
-        console.log(goals);
-        // Prepare for drawing. As an example, we'll draw team1Goals here.
-        goals.forEach((goal) => {
-          console.log(goal);
-          let x = goal.x;
-          let y = goal.y;
-
-          // Transform x and y from the event's coordinate system to SVG's coordinate system.
-          // This function depends on the actual size of your SVG and your event's coordinate system.
-          // Here we simply use x and y as is.
-          let canvasX = this.scaleX(x);
-          let canvasY = this.scaleY(y);
-
-          // Example drawing: draw a red circle for each goal
-          context.beginPath();
-          context.arc(
-            canvasX,
-            canvasY,
-            Math.sqrt(goal.xg) * 20,
-            0,
-            Math.PI * 2,
-            false
-          ); // size is now related to xg
-          context.fillStyle = this.goalColorDict["대한민국"];
-          context.fill();
-
-          this.circles.push({
-            x: canvasX,
-            y: canvasY,
-            radius: Math.sqrt(goal.xg) * 20,
-            text: goal.display_name,
-          });
-        });
-      }
+      const dataList = Object.keys(data).reverse();
+      dataList.forEach((key) => {
+        if (key === "team2") {
+          this.drawShots(data[key].goals, key);
+        } else if (key === "failed_shots") {
+          this.drawShots(data[key], key);
+        }
+      });
     },
     scaleX(x) {
       // Transform x from the event's coordinate system to SVG's coordinate system.
@@ -236,6 +234,16 @@ export default {
       // Here we simply use y as is.
       const calY = this.canvasHeight / 68;
       y = y * calY;
+      return y;
+    },
+    reverseX(x) {
+      const calX = this.canvasWidth / 104;
+      x = (104 - x) * calX; // Subtract x from the maximum X value (104)
+      return x;
+    },
+    reverseY(y) {
+      const calY = this.canvasHeight / 68;
+      y = (68 - y) * calY; // Subtract y from the maximum Y value (68)
       return y;
     },
     handleMouseMove(event) {
@@ -278,7 +286,7 @@ export default {
 
 <style scoped>
 .title {
-  width: 95%;
+  width: 97%;
   color: white;
   font-size: 1rem;
   text-align: center;

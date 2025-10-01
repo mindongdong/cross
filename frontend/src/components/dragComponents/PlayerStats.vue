@@ -191,9 +191,6 @@ export default {
 .layout {
   width: 100%;
   height: 100%;
-  display: flex;
-  flex-direction: column;
-  justify-content: center;
 }
 .title {
   color: white;
@@ -253,7 +250,7 @@ export default {
 
 .chart {
   width: 100%;
-  height: 70%;
+  height: 80%;
   display: flex;
   align-items: center;
   justify-content: center;

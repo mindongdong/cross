@@ -34,8 +34,8 @@
 </template>
 
 <script>
-import { getMatchLineup, getMatchStats } from "@/api/index.js";
-import { Bar } from "vue-chartjs";
+import {getMatchLineup, getMatchStats} from "@/api/index.js";
+import {Bar} from "vue-chartjs";
 import {
   Chart as ChartJS,
   Title,
@@ -52,11 +52,11 @@ ChartJS.register(
   Legend,
   BarElement,
   CategoryScale,
-  LinearScale
+  LinearScale,
 );
 export default {
   name: "MatchStats",
-  components: { Bar },
+  components: {Bar},
   data() {
     return {
       selectedTeam: "",
@@ -91,20 +91,26 @@ export default {
       let sortedData = [...this.filteredStats];
 
       // Filter out the data with '0' x-axis value
-      sortedData = sortedData.filter((item) => item[this.selectedRecord] !== 0);
+      sortedData = sortedData.filter(item => item[this.selectedRecord] !== 0);
 
       // Sort data in descending order
       sortedData.sort(
-        (a, b) => b[this.selectedRecord] - a[this.selectedRecord]
+        (a, b) => b[this.selectedRecord] - a[this.selectedRecord],
       );
 
       return {
-        labels: sortedData.map((item) => item.player_name),
+        labels: sortedData.map(item => item.player_name),
         datasets: [
           {
             label: this.selectedRecord,
-            data: sortedData.map((item) => item[this.selectedRecord]),
-            backgroundColor: "rgba(255,99,132,1)",
+            data: sortedData.map(item => item[this.selectedRecord]),
+            //backgroundColor를 지정할건데, item.team_name을 기준으로 색을 지정하고 싶다.
+            //item.team_name이 독일이면 빨간색, 대한민국이면 초록색으로 지정하고 싶다.
+            backgroundColor: sortedData.map(item =>
+              item.team_name === "독일"
+                ? "rgba(150, 230, 180, 0.8)"
+                : "rgba(255,99,132,0.8)",
+            ),
           },
         ],
       };
@@ -158,21 +164,21 @@ export default {
       // console.log(this.selectedTeam, this.selectedRecord);
       if (this.selectedRecord) {
         const response = await getMatchStats(
-          this.$store.getters.getCurrentTime
+          this.$store.getters.getCurrentTime,
         );
         this.matchStats = response.data;
 
         this.filteredStats = this.matchStats
           .filter(
-            (item) =>
-              this.selectedTeam === "" || item.team_name === this.selectedTeam
+            item =>
+              this.selectedTeam === "" || item.team_name === this.selectedTeam,
           )
-          .map((item) => ({
+          .map(item => ({
             player_name: item.player_name,
             team_name: item.team_name,
             [this.selectedRecord]: item[this.selectedRecord],
           }));
-        // console.log(this.filteredStats);
+        console.log(this.filteredStats);
       }
     },
   },
@@ -192,10 +198,10 @@ export default {
       this.matchStats = response.data;
       this.filteredStats = this.matchStats
         .filter(
-          (item) =>
-            this.selectedTeam === "" || item.team_name === this.selectedTeam
+          item =>
+            this.selectedTeam === "" || item.team_name === this.selectedTeam,
         )
-        .map((item) => ({
+        .map(item => ({
           player_name: item.player_name,
           team_name: item.team_name,
           [this.selectedRecord]: item[this.selectedRecord],
@@ -273,7 +279,7 @@ export default {
 
 .chart {
   width: 100%;
-  height: 70%;
+  height: 75%;
   display: flex;
   align-items: center;
   justify-content: center;
